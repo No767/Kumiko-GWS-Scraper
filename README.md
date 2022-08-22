@@ -4,6 +4,8 @@
 
 ![Kumiko](https://raw.githubusercontent.com/No767/Kumiko/dev/assets/kumiko-resized-round.png)
 
+[![Required Python Version](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)](https://github.com/No767/Kumiko-GWS-Scraper/blob/master/pyproject.toml) ![GitHub](https://img.shields.io/github/license/No767/Kumiko-GWS-Scraper?label=License&logo=github)
+
 A small script meant to help with scraping and data collection for Kumiko's GWS
 
 <div align=left>
