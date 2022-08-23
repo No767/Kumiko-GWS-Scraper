@@ -131,6 +131,75 @@ class KumikoWSUtils:
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+    async def getListOfCharacters(self, type: str, uri: str) -> np.array:
+        """Basically gets all of the characters or weapons off of the DB
+
+        Args:
+            type (str): Type to look for
+            uri (str): Connection URI
+
+        Returns:
+            np.array: An numpy array of `models.WSData`
+        """
+        engine = create_async_engine(uri)
+        asyncSession = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+        async with asyncSession() as session:
+            async with session.begin():
+                selItem = (
+                    select(models.WSData.name)
+                    .where(models.WSData.type == type)
+                    .where(models.WSData.name != "Shinobu")
+                    .where(models.WSData.name != "Hu Tao")
+                    .where(models.WSData.name != "Raiden Shogun")
+                    .where(models.WSData.name != "Miko Yae")
+                    .where(models.WSData.name != "Kamisato Ayaka")
+                    .where(models.WSData.name != "Kujou Sara")
+                    .where(models.WSData.name != "Naganohara Yoimiya")
+                )
+                res = await session.execute(selItem)
+                return np.array([row for row in res.scalars()])
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+    async def getListOfItems(self, type: str, uri: str) -> np.array:
+        """Basically gets all of the characters or weapons off of the DB
+        Args:
+            type (str): Type to look for
+            uri (str): Connection URI
+        Returns:
+            np.array: An numpy array of `models.WSData`
+        """
+        engine = create_async_engine(uri)
+        asyncSession = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+        async with asyncSession() as session:
+            async with session.begin():
+                selItem = select(models.WSData.name).where(models.WSData.type == type)
+                res = await session.execute(selItem)
+                return np.array([row for row in res.scalars()])
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+    async def getSingleWSItemName(self, name: str, uri: str) -> models.WSData:
+        """Just gets one WS item based off of the name given
+
+        Args:
+            name (str): WS Item Name
+            uri (str): Connection URI
+
+        Returns:
+            models.WSData: AN Object of `models.WSData`
+        """
+        engine = create_async_engine(uri)
+        asyncSession = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+        async with asyncSession() as session:
+            async with session.begin():
+                selectOne = select(models.WSData).filter(models.WSData.name == name)
+                itemSelected = await session.scalars(selectOne)
+                itemSelectedFirst = itemSelected.first()
+                return itemSelectedFirst
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
     async def getRandomWS(self, uri: str) -> list:
         """Randomly picks out a row based on the WS Dataset
 

@@ -18,6 +18,8 @@ SQLAlchemy = "^1.4.40"
 asyncpg = "^0.26.0"
 python-dotenv = "^0.20.0"
 numpy = "^1.23.2"
+wget = "^3.2"
+aiofiles = "^0.8.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.20.0"
