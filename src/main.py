@@ -138,5 +138,18 @@ async def addWeapons():
                 )
 
 
+async def scrapAssets():
+    async with aiohttp.ClientSession(json_serialize=orjson.dumps) as session:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+        }
+        async with session.get(
+            f"https://www.gensh.in/characters/venti", headers=headers
+        ) as r:
+            data = await r.text()
+            soup = BeautifulSoup(data, "lxml")
+            assets = soup.find("img", class_="img-fluid")
+            print(f'https://www.gensh.in{assets["src"]}')
+
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-asyncio.run(addCharacters())
+asyncio.run(scrapAssets())
