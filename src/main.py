@@ -202,7 +202,6 @@ async def scrapAnotherAssets():
                 logging.info(f"Downloaded Asset - {name}, {itemUUID}")
 
 
-# TODO: Add Amos' Bow Manually
 async def scrapWeaponsAssets():
     mainRes = await wsUtils.getListOfWeapons(type="weapon", uri=WS_CONNECTION_URI)
     for items in mainRes:
