@@ -37,28 +37,7 @@ listOfCharacters = [
 ]
 listOfCharactersManual = ["hu-tao", "raiden", "yae-miko", "ayaka", "yoimiya"]
 
-listOfWeapons = [
-    "the-catch",
-    "redhorn-stonethresher",
-    "frostbearer",
-    "the-black-sword",
-    "travelers-handy-sword",
-    "skyrider-sword",
-    "dark-iron-sword",
-    "fillet-blade",
-    "royal-longsword",
-    "cinnabar-spindle",
-    "skyrider-greatsword",
-    "messenger",
-    "windblume-ode",
-    "royal-bow",
-    "halberd",
-    "wine-and-song",
-    "iron-sting",
-    "staff-of-homa",
-    "solar-pearl",
-    "mappa-mare",
-]
+listOfWeapons = ["mistsplitter-reforged"]
 
 
 wsUtils = KumikoWSUtils()
@@ -237,5 +216,38 @@ async def scrapWeaponsAssets():
                 )
 
 
+async def scrapWeaponsAssetList():
+    for items in listOfWeapons:
+        await asyncio.sleep(3)
+        async with aiohttp.ClientSession(json_serialize=orjson.dumps) as session:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+            }
+            async with session.get(
+                f"https://www.gensh.in/database/weapon/{items}", headers=headers
+            ) as r:
+                data = await r.text()
+                soup = BeautifulSoup(data, "lxml")
+                assets = soup.find("img", class_="img-fluid")
+                actualAsset = f'https://www.gensh.in{assets["src"]}'
+                listOfText = [item for item in soup.find_all("div", class_="card-body")]
+                itemName = listOfText[0].h2.get_text()
+                parsedItemName = str(itemName).strip()
+                mainResDB = await wsUtils.getSingleWSItemName(
+                    name=str(parsedItemName), uri=WS_CONNECTION_URI
+                )
+                getPath = Path(__file__).parents[1]
+                wget.download(
+                    actualAsset,
+                    out=os.path.join(
+                        getPath, "assets", f"{dict(mainResDB)['uuid']}.png"
+                    ),
+                    bar=None,
+                )
+                logging.info(
+                    f"Successfully Downloaded Weapons Asset - {parsedItemName}, {dict(mainResDB)['uuid']}"
+                )
+
+
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-asyncio.run(scrapWeaponsAssets())
+asyncio.run(scrapWeaponsAssetList())
