@@ -202,10 +202,12 @@ async def scrapAnotherAssets():
                 logging.info(f"Downloaded Asset - {name}, {itemUUID}")
 
 
+# TODO: Add Amos' Bow Manually
 async def scrapWeaponsAssets():
-    mainRes = await wsUtils.getListOfItems(type="weapon", uri=WS_CONNECTION_URI)
+    mainRes = await wsUtils.getListOfWeapons(type="weapon", uri=WS_CONNECTION_URI)
     for items in mainRes:
         itemPathName = str(items).lower().replace("'", "").replace(" ", "-")
+        await asyncio.sleep(3)
         async with aiohttp.ClientSession(json_serialize=orjson.dumps) as session:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
@@ -223,22 +225,17 @@ async def scrapWeaponsAssets():
                 mainResDB = await wsUtils.getSingleWSItemName(
                     name=str(parsedItemName), uri=WS_CONNECTION_URI
                 )
-                print(mainResDB)
-                logging.info(f"{parsedItemName}, {dict(mainResDB)['uuid']}")
-
-
-async def main():
-    async with aiohttp.ClientSession(json_serialize=orjson.dumps) as session:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
-        }
-        async with session.get(
-            f"https://www.gensh.in/database/weapon/the-catch", headers=headers
-        ) as r:
-            data = await r.text()
-            soup = BeautifulSoup(data, "lxml")
-            assets = soup.find("img", class_="img-fluid")
-            actualAsset = f'https://www.gensh.in{assets["src"]}'
+                getPath = Path(__file__).parents[1]
+                wget.download(
+                    actualAsset,
+                    out=os.path.join(
+                        getPath, "assets", f"{dict(mainResDB)['uuid']}.png"
+                    ),
+                    bar=None,
+                )
+                logging.info(
+                    f"Successfully Downloaded Weapons Asset - {parsedItemName}, {dict(mainResDB)['uuid']}"
+                )
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

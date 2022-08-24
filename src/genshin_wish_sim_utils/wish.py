@@ -179,6 +179,28 @@ class KumikoWSUtils:
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+    async def getListOfWeapons(self, type: str, uri: str) -> np.array:
+        """Basically gets all of the weapons off of the DB
+        Args:
+            type (str): Type to look for
+            uri (str): Connection URI
+        Returns:
+            np.array: An numpy array of `models.WSData`
+        """
+        engine = create_async_engine(uri)
+        asyncSession = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+        async with asyncSession() as session:
+            async with session.begin():
+                selItem = (
+                    select(models.WSData.name)
+                    .where(models.WSData.type == type)
+                    .filter(models.WSData.name != "Amos' Bow")
+                )
+                res = await session.execute(selItem)
+                return np.array([row for row in res.scalars()])
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
     async def getSingleWSItemName(self, name: str, uri: str) -> models.WSData:
         """Just gets one WS item based off of the name given
 
